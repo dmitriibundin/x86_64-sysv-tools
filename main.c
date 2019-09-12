@@ -1,8 +1,14 @@
 #include <stdio.h>
 #include <stdalign.h>
+#include "info.h"
 #include "min.h"
 
 int main(void){
+    unsigned L1_cache_size_info = xsti_cache_size(1);
+    unsigned L2_cache_size_info = xsti_cache_size(2);
+    unsigned L3_cache_size_info = xsti_cache_size(3);
+    printf("L1 size info = %u, L2 size info = %u, L3 size info = %u\n", L1_cache_size_info, L2_cache_size_info, L3_cache_size_info);
+
     unsigned int L1_cache_size = get_cache_line_size(1);
     unsigned int L2_cache_size = get_cache_line_size(2);
     unsigned int L3_cache_size = get_cache_line_size(3);

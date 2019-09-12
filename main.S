@@ -14,6 +14,12 @@ section .text
 global _start
 
 _start:
+    call extended_max_addr
+    call extended_invariant_info
+    call extended_cache_info
+    call cpu_brand_string
+    call extended_cpu_features
+    call extended_cpuid_max
     mov rdi, data_1
     call generate_some_data
 
@@ -33,6 +39,65 @@ _start:
     mov rax, SYS_exit
     mov rdi, EXIT_SUCCESS
     syscall
+
+extended_max_addr:
+    push rbx
+
+    mov eax, 0x80000008
+    cpuid
+
+    pop rbx
+    ret
+
+extended_invariant_info:
+    push rbx
+
+    mov eax, 0x80000007
+    cpuid
+
+    pop rbx
+    ret
+
+extended_cache_info:
+    push rbx
+
+    mov eax, 0x80000006
+    cpuid
+
+    pop rbx
+    ret
+cpu_brand_string:
+    push rbx
+
+    sub rsp, 0x100
+    mov eax, 0x80000002
+    cpuid
+
+    mov [rsp], eax
+    mov [rsp + 0x04], ebx
+    mov [rsp + 0x08], ecx
+    mov [rsp + 0x0C], edx
+
+    add rsp, 0x100
+    pop rbx
+    ret
+extended_cpu_features:
+    push rbx
+
+    mov eax, 0x80000001
+    cpuid
+
+    pop rbx
+    ret
+
+extended_cpuid_max:
+    push rbx
+    
+    mov eax, 0x80000000
+    cpuid
+
+    pop rbx
+    ret
 
 generate_some_data:
     mov qword [rdi], 1
