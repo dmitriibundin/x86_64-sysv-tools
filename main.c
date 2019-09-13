@@ -16,6 +16,13 @@ int main(void){
 
     test(31);
 
+    unsigned logical_cores_count_1_info = xsti_logical_cores();
+    unsigned logical_cores_count_2_info = xsti_logical_cores();
+    unsigned logical_cores_count_3_info = xsti_logical_cores();
+    printf("Logical core 1 info = %u\n", logical_cores_count_1_info);
+    printf("Logical core 2 info = %u\n", logical_cores_count_2_info);
+    printf("Logical core 3 info = %u\n", logical_cores_count_3_info);
+
     unsigned int logical_cores_count_1 = cpu_topology_get_logical_cores();
     unsigned int logical_cores_count_2 = cpu_topology_get_logical_cores();
     unsigned int logical_cores_count_3 = cpu_topology_get_logical_cores();
