@@ -11,9 +11,13 @@ unsigned xsti_cache_size(unsigned cache_level);
 
 unsigned xsti_logical_cores(void);
 
-unsigned xsti_base_frequency(void);
+struct xsti_frequencies{
+    unsigned base_cpu_frequency;
+    unsigned max_cpu_frequency;
+    unsigned bus_frequency;
+};
 
-unsigned xsti_max_frequency(void);
+struct xsti_frequencies xsti_frequencies(void);
 
 int xsti_cpu_brand_string(char *buf, size_t len);
 

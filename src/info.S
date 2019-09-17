@@ -2,13 +2,13 @@ CPUID_CACHE_PARAM_LEAF          equ 0x04
 CPUID_TOPOLOGY_LEAF             equ 0x0B
 CPUID_TOPOLOGY_CORE_LEVEL_TYPE  equ 0x02
 CPUID_TOPOLOGY_INVALID_TYPE     equ 0x00
+CPUID_FREQUENCY_LEAF            equ 0x16
 
 section .text
 
 global xsti_cache_size
 global xsti_logical_cores
-global xsti_base_frequency
-global xsti_max_frequency
+global xsti_frequencies
 
 ;1st arg -- cache level
 xsti_cache_size:
@@ -90,3 +90,26 @@ xsti_logical_cores_loop_end:
 mov eax, r11d
 pop rbx
 ret
+
+xsti_frequencies:
+
+    ;save rbx to restore on return
+    push rbx
+
+    ;set frequency leaf for cpuid
+    mov eax, CPUID_FREQUENCY_LEAF
+
+    cpuid
+
+    ;set base and max frequence to the first return register
+    and rax, 0xffff ;zero bits not used for base frequency
+    and rbx, 0xffff ;zero bits not used for max frequency
+    shl rbx, 32
+    or rax, rbx
+
+    ;set bus frequency
+    and ecx, 0xffff ;zero bits not used for max frequency
+    mov edx, ecx
+
+    pop rbx
+    ret
