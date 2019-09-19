@@ -1,14 +1,20 @@
-CPUID_CACHE_PARAM_LEAF          equ 0x04
-CPUID_TOPOLOGY_LEAF             equ 0x0B
-CPUID_TOPOLOGY_CORE_LEVEL_TYPE  equ 0x02
-CPUID_TOPOLOGY_INVALID_TYPE     equ 0x00
-CPUID_FREQUENCY_LEAF            equ 0x16
+CPUID_CACHE_PARAM_LEAF                  equ 0x04
+CPUID_TOPOLOGY_LEAF                     equ 0x0B
+CPUID_TOPOLOGY_CORE_LEVEL_TYPE          equ 0x02
+CPUID_TOPOLOGY_INVALID_TYPE             equ 0x00
+CPUID_FREQUENCY_LEAF                    equ 0x16
+CPUID_BRAND_STRING_LEAF_1               equ 0x80000002
+CPUID_BRAND_STRING_LEAF_2               equ 0x80000003
+CPUID_BRAND_STRING_LEAF_3               equ 0x80000004
+CPUID_BRAND_STRING_LEAF_BUFFER_SIZE     equ 4 * 4 * 3   ;4 4-bytes length register per each leaf
+                                                        ;3 leafs in total
 
 section .text
 
 global xsti_cache_size
 global xsti_logical_cores
 global xsti_frequencies
+global xsti_cpu_brand_string
 
 ;1st arg -- cache level
 xsti_cache_size:
@@ -102,8 +108,8 @@ xsti_frequencies:
     cpuid
 
     ;set base and max frequence to the first return register
-    and rax, 0xffff ;zero bits not used for base frequency
-    and rbx, 0xffff ;zero bits not used for max frequency
+    and eax, 0xffff ;zero bits not used for base frequency
+    and ebx, 0xffff ;zero bits not used for max frequency
     shl rbx, 32
     or rax, rbx
 
@@ -112,4 +118,66 @@ xsti_frequencies:
     mov edx, ecx
 
     pop rbx
+    ret
+
+;1st argument - pointer to a buffer
+;2nd argument - buffer size
+xsti_cpu_brand_string:
+    ;compare if the buffer size is enough to hold
+    ;the max of possible value of CPU brand string
+    cmp rsi, CPUID_BRAND_STRING_LEAF_BUFFER_SIZE
+    jae xsti_cpu_brand_string_valid_buffer
+
+    ;return the minimum required buffer size
+    mov rax, CPUID_BRAND_STRING_LEAF_BUFFER_SIZE
+    ret
+
+    xsti_cpu_brand_string_valid_buffer:
+    ;save rbx to restore on return
+    push rbx
+
+    ;zero buffer offset counter
+    xor r10d, r10d
+
+    ;set the first part brand string leaf to cpuid
+    mov eax, CPUID_BRAND_STRING_LEAF_1
+
+    cpuid
+
+    ;copy the resulting brand string part of this leaf
+    ;to the buffer pointed to by rdi
+    mov [rdi]       , eax
+    mov [rdi + 0x04], ebx
+    mov [rdi + 0x08], ecx
+    mov [rdi + 0x0c], edx
+    add rdi, 0x10
+
+    ;set the second part brand string leaf to cpuid
+    mov eax, CPUID_BRAND_STRING_LEAF_2
+
+    cpuid
+
+    ;copy the resulting brand string part of this leaf
+    ;to the buffer pointed to by rdi
+    mov [rdi], eax
+    mov [rdi + 0x04], ebx
+    mov [rdi + 0x08], ecx
+    mov [rdi + 0x0c], edx
+    add rdi, 0x10
+
+    ;set the third part brand string leaf to cpuid
+    mov eax, CPUID_BRAND_STRING_LEAF_3
+
+    cpuid
+
+    ;copy the resulting brand string part of this lead
+    ;to the buffer pointed to by rdi
+    mov [rdi], eax
+    mov [rdi + 0x04], ebx
+    mov [rdi + 0x08], ecx
+    mov [rdi + 0x0c], edx
+    add rdi, 0x10
+
+    pop rbx
+    mov rax, 0
     ret

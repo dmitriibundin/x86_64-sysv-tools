@@ -19,7 +19,15 @@ struct xsti_frequencies{
 
 struct xsti_frequencies xsti_frequencies(void);
 
-int xsti_cpu_brand_string(char *buf, size_t len);
+/**
+ * Reads the brand string of this CPU into the buffer passed in as the first argument
+ * with the size as the second argument.
+ * 
+ * Returns:
+ *  minimum required buffer size - if the buffer is too small
+ *  0                            - on success
+ */
+unsigned xsti_cpu_brand_string(char *buf, size_t len);
 
 #ifdef __cplusplus
 }

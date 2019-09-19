@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdalign.h>
+#include <string.h>
 #include "info.h"
 #include "min.h"
 
@@ -34,6 +35,16 @@ int main(void){
     printf("Logical cores 1 = %u\n", logical_cores_count_1);
     printf("Logical cores 2 = %u\n", logical_cores_count_2);
     printf("Logical cores 3 = %u\n", logical_cores_count_3);
+
+    char buf[64];
+    memset(buf, '\0', sizeof(buf));
+    unsigned xsti_cpu_brand_string_result = 0;
+    if((xsti_cpu_brand_string_result = xsti_cpu_brand_string(buf, sizeof(buf))) == 0){
+        printf("CPU brand string = %s\n", buf);
+    } else {
+        printf("The buffer is required to have at least %u bytes\n", xsti_cpu_brand_string_result);
+    }
+
     _Alignas(AVX2_ALIGNEMENT) long long longs[] = {1333, 3123, 3, 122};
     long long *min_ptr = avx2_find_min(longs);
     printf("The minimum is %lli\n", *min_ptr);
