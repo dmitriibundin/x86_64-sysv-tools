@@ -9,7 +9,4 @@ unsigned int get_cache_line_size(unsigned int cache_level);
 
 unsigned int cpu_topology_get_logical_cores(void);
 
-void test(int a){
-    (void) a;
-}
 #endif //AVX2_MIN_H

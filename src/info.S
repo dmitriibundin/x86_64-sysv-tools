@@ -8,15 +8,18 @@ CPUID_BRAND_STRING_LEAF_2               equ 0x80000003
 CPUID_BRAND_STRING_LEAF_3               equ 0x80000004
 CPUID_BRAND_STRING_LEAF_BUFFER_SIZE     equ 4 * 4 * 3   ;4 4-bytes length register per each leaf
                                                         ;3 leafs in total
+CPUID_CACHE_EXTENDED_LEAF               equ 0x80000006
 
 section .text
 
 global xsti_cache_size
+global xsti_cache_line_size
 global xsti_logical_cores
 global xsti_frequencies
 global xsti_cpu_brand_string
 
-;1st arg -- cache level
+;1st arg -- hidden struct xsti_cpu_cache pointer
+;2nd arg -- cache level
 xsti_cache_size:
 
     ;save rbx to restore on return
@@ -27,7 +30,7 @@ xsti_cache_size:
 
     ;set the cache index argument for cpuid
     ;passed as the first function argument
-    mov rcx, rdi
+    mov rcx, rsi
 
     ;the cpuid instruction for the leaf will 
     cpuid
@@ -35,11 +38,13 @@ xsti_cache_size:
     ;account number of sets
     mov eax, ecx
     inc eax
+    mov [rdi], eax ;set the number of sets to the first member of struct xsti_cpu_cache
 
     ;account line size
     mov r11d, ebx
     and r11d, 0xfff ;zero bits not used for line size
     inc r11d
+    mov [rdi + 0x04], r11d  ;set the line size to the second member of struct xsti_cpu_cache
     mul r11d
 
     ;account line partitions
@@ -47,6 +52,7 @@ xsti_cache_size:
     shr r11d, 12    ;shift out the line size bits accounted before
     and r11d, 0x3ff ;zero bits not used for partitions count
     inc r11d
+    mov [rdi + 0x08], r11d;set the partitions to the third member of struct xsti_cpu_cache
     mul r11d
 
     ;account associativity ways
@@ -54,8 +60,14 @@ xsti_cache_size:
     shr r11d, 22    ;shift out the partitions count bits accounted before
     and r11d, 0x3ff ;zero bits not used for partitions count
     inc r11d
+    mov [rdi + 0x0c], r11d;set the associativity ways to the fourth member of struct xsti_cpu_cache
     mul r11d
 
+    mov [rdi + 0x10], rax;set the total cache size at the current level to the fifth member of struct xsti_cpu_cache
+
+    ;return the first hidden argument
+    ;as require by SystemV ABI.
+    mov rax, rdi
     ;restore rbx and return
     pop rbx
     ret
@@ -180,4 +192,20 @@ xsti_cpu_brand_string:
 
     pop rbx
     mov rax, 0
+    ret
+
+xsti_cache_line_size:
+
+    ;save rbx to restore on return
+    push rbx
+
+    ;set cache extended leaf to cpuid
+    mov eax, CPUID_CACHE_EXTENDED_LEAF
+
+    cpuid
+
+    and ecx, 0xff   ;zero bits not used in cache line size
+    mov eax, ecx
+
+    pop rbx
     ret

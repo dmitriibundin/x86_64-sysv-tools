@@ -7,7 +7,17 @@ extern "C" {
 
 //Namespace xsti -- x86_sysv_tools_info
 
-unsigned xsti_cache_size(unsigned cache_level);
+struct xsti_cpu_cache {
+    unsigned    number_of_sets,
+                line_size,
+                physical_line_partitions,
+                associativity_ways, 
+                total_cache_size;
+};
+
+struct xsti_cpu_cache xsti_cache_size(unsigned cache_level);
+
+unsigned xsti_cache_line_size(void);
 
 unsigned xsti_logical_cores(void);
 
