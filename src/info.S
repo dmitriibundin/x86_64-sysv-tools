@@ -1,3 +1,6 @@
+CPUID_VENDOR_STRING_LEAF                equ 0x00
+CPUID_VENDOR_UNKNOWN                    equ -1
+CPUID_VENDOR_INTEL                      equ 0x00
 CPUID_CACHE_PARAM_LEAF                  equ 0x04
 CPUID_TOPOLOGY_LEAF                     equ 0x0B
 CPUID_TOPOLOGY_CORE_LEVEL_TYPE          equ 0x02
@@ -10,13 +13,53 @@ CPUID_BRAND_STRING_LEAF_BUFFER_SIZE     equ 4 * 4 * 3   ;4 4-bytes length regist
                                                         ;3 leafs in total
 CPUID_CACHE_EXTENDED_LEAF               equ 0x80000006
 
+section .rodata
+    CPUID_VENDOR_STRING_INTEL:   db 'GenuineIntel', 0
+;    align 64
+;    CPUID_VENDOR_STRING_AMD     db "AuthenticAMD", 0
+
 section .text
 
+global xsti_cpu_vendor
 global xsti_cache_size
 global xsti_cache_line_size
 global xsti_logical_cores
 global xsti_frequencies
 global xsti_cpu_brand_string
+
+xsti_cpu_vendor:
+    ;save rbx to restore on return
+    push rbx
+
+    ;set vendor string leaf for cpuid
+    mov eax, CPUID_VENDOR_STRING_LEAF
+
+    cpuid
+
+    mov r10, CPUID_VENDOR_STRING_INTEL
+    ;compare the first 4 ASCII chars of the Intel vendor string
+    cmp ebx, [r10]
+    jne xsti_cpu_vendor_unknown
+
+    ;compare the second 4 ASCII chars of the Intel vendor string
+    cmp edx, [r10 + 0x04]
+    jne xsti_cpu_vendor_unknown
+
+    ;compare the third 4 ASCII chars of the Intek vendor string
+    cmp ecx, [r10 + 0x08]
+    jne xsti_cpu_vendor_unknown
+
+    mov eax, CPUID_VENDOR_INTEL
+    jmp xsti_cpu_vendor_return
+
+    xsti_cpu_vendor_unknown:
+        ;set unknown vendor return value
+        mov eax, CPUID_VENDOR_UNKNOWN
+
+    xsti_cpu_vendor_return:
+    ;restore rbx and return
+    pop rbx
+    ret
 
 ;1st arg -- hidden struct xsti_cpu_cache pointer
 ;2nd arg -- cache level

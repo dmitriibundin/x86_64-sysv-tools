@@ -5,6 +5,8 @@
 #include "min.h"
 
 int main(void){
+    enum xsti_cpu_vendor vendor = xsti_cpu_vendor();
+    printf("Vendor = %d\n", vendor);
     struct xsti_cpu_cache L1_cache_info = xsti_cache_size(1);
     struct xsti_cpu_cache L2_cache_info = xsti_cache_size(2);
     struct xsti_cpu_cache L3_cache_info = xsti_cache_size(3);

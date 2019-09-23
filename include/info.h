@@ -7,6 +7,14 @@ extern "C" {
 
 //Namespace xsti -- x86_sysv_tools_info
 
+enum xsti_cpu_vendor{
+    INTEL = 0,
+
+    UNKNOWN = -1
+};
+
+enum xsti_cpu_vendor xsti_cpu_vendor(void);
+
 struct xsti_cpu_cache {
     unsigned    number_of_sets,
                 line_size,
