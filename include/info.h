@@ -15,6 +15,12 @@ enum xsti_cpu_vendor{
 
 enum xsti_cpu_vendor xsti_cpu_vendor(void);
 
+struct xsti_tlb {
+    unsigned    entries,
+                page_size,
+                associativity;
+};
+
 struct xsti_cpu_cache {
     unsigned    number_of_sets,
                 line_size,
