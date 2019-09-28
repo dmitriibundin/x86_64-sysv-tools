@@ -26,6 +26,25 @@ global xsti_cache_line_size
 global xsti_logical_cores
 global xsti_frequencies
 global xsti_cpu_brand_string
+global xsti_get_tlb
+
+; intel_is_cache_available:
+;     push rbx
+
+;     mov eax, 0x02
+;     cpuid
+
+;     pop rbx
+;     ret
+
+xsti_get_tlb:
+
+    ;save rbx to restore on return
+    push rbx
+
+    pop rbx
+    ret
+
 
 xsti_cpu_vendor:
     ;save rbx to restore on return
@@ -149,6 +168,7 @@ xsti_logical_cores:
     xsti_logical_cores_loop_end:
 
     mov eax, r11d
+    ;restore rbx and return
     pop rbx
     ret
 
@@ -172,6 +192,7 @@ xsti_frequencies:
     and ecx, 0xffff ;zero bits not used for max frequency
     mov edx, ecx
 
+    ;restore rbx and return
     pop rbx
     ret
 
@@ -233,8 +254,9 @@ xsti_cpu_brand_string:
     mov [rdi + 0x0c], edx
     add rdi, 0x10
 
-    pop rbx
     mov rax, 0
+    ;restore rbx and return
+    pop rbx
     ret
 
 xsti_cache_line_size:
@@ -250,5 +272,6 @@ xsti_cache_line_size:
     and ecx, 0xff   ;zero bits not used in cache line size
     mov eax, ecx
 
+    ;restore rbx and return
     pop rbx
     ret

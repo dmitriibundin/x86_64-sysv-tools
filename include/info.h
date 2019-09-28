@@ -15,11 +15,25 @@ enum xsti_cpu_vendor{
 
 enum xsti_cpu_vendor xsti_cpu_vendor(void);
 
+//For the 2nd level TLB the associativity ways
+//are incorrectly reported on Kaby Lake as
+//6-ways set associative, but actually 12-ways
 struct xsti_tlb {
     unsigned    entries,
                 page_size,
                 associativity;
 };
+
+/**
+ * Given the enum cpu_vendor stores the TLB cache information for the
+ * specified cache_level in the struct xsti_tlb *tlb out parameter
+ * 
+ * Returns:
+ *  on success  - 0
+ *  error code  - in case some error occurred
+ *  
+ */
+unsigned xsti_get_tlb(enum xsti_cpu_vendor, unsigned cache_level, struct xsti_tlb *tlb_out);
 
 struct xsti_cpu_cache {
     unsigned    number_of_sets,
