@@ -1,3 +1,4 @@
+CPUID_INTEL_CACHE_LEAF_LEGACY           equ 0x02
 CPUID_VENDOR_STRING_LEAF                equ 0x00
 CPUID_VENDOR_UNKNOWN                    equ -1
 CPUID_VENDOR_INTEL                      equ 0x00
@@ -28,20 +29,19 @@ global xsti_frequencies
 global xsti_cpu_brand_string
 global xsti_get_tlb
 
-; intel_is_cache_available:
-;     push rbx
-
-;     mov eax, 0x02
-;     cpuid
-
-;     pop rbx
-;     ret
-
+;1st arg - vendor
 xsti_get_tlb:
 
     ;save rbx to restore on return
     push rbx
 
+    cmp 
+
+    ;set intel cache leaf legacy for cpuid
+    mov eax, CPUID_INTEL_CACHE_LEAF_LEGACY
+
+
+xsti_get_tlb_return:
     pop rbx
     ret
 

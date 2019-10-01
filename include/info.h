@@ -20,9 +20,10 @@ enum xsti_cpu_vendor xsti_cpu_vendor(void);
 //6-ways set associative, but actually 12-ways
 struct xsti_tlb {
     unsigned    entries,
-                page_size,
                 associativity;
 };
+
+void xsti_get_supported_page_sizes(enum xsti_cpu_vendor);
 
 /**
  * Given the enum cpu_vendor stores the TLB cache information for the
@@ -33,7 +34,10 @@ struct xsti_tlb {
  *  error code  - in case some error occurred
  *  
  */
-unsigned xsti_get_tlb(enum xsti_cpu_vendor, unsigned cache_level, struct xsti_tlb *tlb_out);
+unsigned xsti_get_data_tlb(enum xsti_cpu_vendor,
+                            unsigned cache_level,
+                            unsigned page_size,
+                            struct xsti_tlb *tlb_out);
 
 struct xsti_cpu_cache {
     unsigned    number_of_sets,
