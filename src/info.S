@@ -1,3 +1,5 @@
+%include "errors.inc"
+
 CPUID_INTEL_CACHE_LEAF_LEGACY           equ 0x02
 CPUID_VENDOR_STRING_LEAF                equ 0x00
 CPUID_VENDOR_UNKNOWN                    equ -1
@@ -35,7 +37,7 @@ xsti_get_tlb:
     ;save rbx to restore on return
     push rbx
 
-    cmp 
+    ; cmp 
 
     ;set intel cache leaf legacy for cpuid
     mov eax, CPUID_INTEL_CACHE_LEAF_LEGACY

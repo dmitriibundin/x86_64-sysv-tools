@@ -7,7 +7,7 @@ import sys
 
 DIRECTIVE_START_TOKEN = "#"
 #Currently only #define directives are recognized
-DIRECTIVE_PATTERN = "#(\t|\s)*define(\t|\s)*(([a-zA-Z0-9_]|[\u0024\u0040\u0060]|(?![\u0000-\u00A0])|(?![\u8000-\udfff]))*)((\t|\s)+(.*)|(\t|\s)*)"
+DIRECTIVE_PATTERN = "#(\t|\s)*define(\t|\s)*(([a-zA-Z0-9_]|[\u0024\u0040\u0060]|(?![\u0000-\u00A0]))*)((\t|\s)+(.*)|(\t|\s)*)"
 SPLICE_PATTERN = "\\\\(\t|\s)*(\r\n|\r|\n)"
 
 @dataclass
