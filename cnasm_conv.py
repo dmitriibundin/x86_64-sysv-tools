@@ -2,9 +2,11 @@
 from dataclasses import dataclass
 import re
 import sys
+from pathlib import Path
 
 #Convert C header files to nasm
 
+NASM_INCLUDE_SUFFIX = ".inc"
 DIRECTIVE_START_TOKEN = "#"
 #Currently only #define directives are recognized
 DIRECTIVE_PATTERN = "#(\t|\s)*define(\t|\s)*(([a-zA-Z0-9_]|[\u0024\u0040\u0060]|(?![\u0000-\u00A0]))*)((\t|\s)+(.*)|(\t|\s)*)"
@@ -56,11 +58,13 @@ if __name__ == "__main__":
         print (f"Illegal number of command line arguments. Expected: 2, actual: {args_count - 1}")
         sys.exit(1)
     c_header_path = sys.argv[1]
-    nasm_header_path = sys.argv[2]
+    nasm_output_dir = sys.argv[2]
     with open(c_header_path) as fd:
         c_header = fd.read()
+
     nasm_define_directives = [F"%define {object_define.macro_name} {object_define.macro_value or ''}" for object_define in object_defines(c_header)]
 
+    nasm_header_path = Path(nasm_output_dir, Path(c_header_path).stem).with_suffix(NASM_INCLUDE_SUFFIX)
 
     with open(nasm_header_path, 'w+') as nasm_header_fd:
         nasm_header_fd.writelines(line + '\n' for line in nasm_define_directives)
