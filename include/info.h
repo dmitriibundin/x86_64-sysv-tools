@@ -15,15 +15,31 @@ enum xsti_cpu_vendor{
 
 enum xsti_cpu_vendor xsti_cpu_vendor(void);
 
+//Since the upper bound of cache levels is well-known
+//it should be possible to accept a pointer with size
+
 //For the 2nd level TLB the associativity ways
 //are incorrectly reported on Kaby Lake as
 //6-ways set associative, but actually 12-ways
 struct xsti_tlb {
     unsigned    entries,
+                page_size,
                 associativity;
+    char        is_unified;
 };
 
-void xsti_get_supported_page_sizes(enum xsti_cpu_vendor);
+/**
+ * Given an array of NULL-terminated pointer list fills it with
+ * a TLB description for each particular used as an array index.
+ * If the array size specified in the parameter cache_levels
+ * exceeds the actual number of caches for the current cpu then 
+ * an index corresponding to this level is set to NULL.
+ * 
+ * returns:
+ *  0 - on success
+ * -1 - on error
+ */
+int get_tlb(enum xsti_cpu_vendor vendor, struct xsti_tlb *caches[], size_t cache_levels);
 
 /**
  * Given the enum cpu_vendor stores the TLB cache information for the
@@ -31,7 +47,7 @@ void xsti_get_supported_page_sizes(enum xsti_cpu_vendor);
  * 
  * Returns:
  *  on success  - 0
- *  error code  - in case some error occurred
+ *  error code  - in case an error occurred
  *  
  */
 unsigned xsti_get_data_tlb(enum xsti_cpu_vendor,
