@@ -8,9 +8,9 @@ extern "C" {
 //Namespace xsti -- x86_sysv_tools_info
 
 enum xsti_cpu_vendor{
-    INTEL = 0,
+    CPU_VENDOR_INTEL = 0,
 
-    UNKNOWN = -1
+    CPU_VENDOR_UNKNOWN = -1
 };
 
 enum xsti_cpu_vendor xsti_cpu_vendor(void);
@@ -22,10 +22,11 @@ enum xsti_cpu_vendor xsti_cpu_vendor(void);
 //are incorrectly reported on Kaby Lake as
 //6-ways set associative, but actually 12-ways
 struct xsti_tlb {
-    unsigned    entries,
-                page_size,
-                associativity;
-    char        is_unified;
+    unsigned      entries,
+                  page_size,
+                  associativity;
+    unsigned char data: 1,
+                  instruction: 1;
 };
 
 /**
