@@ -40,7 +40,9 @@ struct xsti_tlb {
  *  0 - on success
  * -1 - on error
  */
-int get_tlb(enum xsti_cpu_vendor vendor, struct xsti_tlb *caches[], size_t cache_levels);
+
+//Probably accept varargs as {size_t, struct xsti_tlb*}
+int get_tlb(size_t level_from, size_t level_to, ...);
 
 /**
  * Given the enum cpu_vendor stores the TLB cache information for the
