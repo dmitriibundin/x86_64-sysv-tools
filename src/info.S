@@ -33,17 +33,13 @@ global xsti_get_tlb
 
 ;1st arg - vendor
 xsti_get_tlb:
-
     ;save rbx to restore on return
     push rbx
 
-    ; cmp 
-
     ;set intel cache leaf legacy for cpuid
     mov eax, CPUID_INTEL_CACHE_LEAF_LEGACY
+    cpuid
 
-
-xsti_get_tlb_return:
     pop rbx
     ret
 

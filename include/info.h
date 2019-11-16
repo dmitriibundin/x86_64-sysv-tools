@@ -15,9 +15,6 @@ enum xsti_cpu_vendor{
 
 enum xsti_cpu_vendor xsti_cpu_vendor(void);
 
-//Since the upper bound of cache levels is well-known
-//it should be possible to accept a pointer with size
-
 //For the 2nd level TLB the associativity ways
 //are incorrectly reported on Kaby Lake as
 //6-ways set associative, but actually 12-ways
@@ -30,33 +27,45 @@ struct xsti_tlb {
 };
 
 /**
- * Given an array of NULL-terminated pointer list fills it with
- * a TLB description for each particular used as an array index.
- * If the array size specified in the parameter cache_levels
- * exceeds the actual number of caches for the current cpu then 
- * an index corresponding to this level is set to NULL.
+ * Given a level_from and level_to parameters collects information
+ * regarding TLB caches starting from level_from (inclusive) up to
+ * level_to (exclusive) and stores the result into arguments passed in
+ * as an ellipsis.
  * 
+ * For each requested TLB cache level 2 parameters is required
+ * to be passed in the ellipsis:
+ * 
+ *  size_t *sz - a pointer to a size of struct xsti_tlb* array used for a given TLB cache level.
+ *               It should contain the size of struct xsti_tlb* array used for a particular TLB cache
+ *               level prior to the function call. The value contained in the object pointed to by sz
+ *               after the function call reflects the actual number of struct xsti_tlb* entries
+ *               that were initialized by the function call
+ * 
+ *  struct xsti_tlb* - an array of a struct xsti_tlb with the size passed in 
+ *                     the previous parameter
+ * 
+ * For example:
+ * 
+ * struct xsti_tlb l2_tlb[3];
+ * size_t l2_tlb_entries = sizeof l2_tlb / sizeof(struct xsti_tlb);
+ * 
+ * struct xsti_tlb l3_tlb[5];
+ * size_t l3_tlb_entries = sizeof l3_tlb / sizeof(struct xsti_tlb);
+ * 
+ * strict xsti_tlb l4_tlb[27];
+ * size_t l4_tlb_entries = sizeof l4_tlb / sizeof(struct xsti_tlb);
+ * 
+ * int result = xsti_get_tlb(2, 5,
+ *                           &l2_tlb_entries, l2_tlb,
+ *                           &l3_tlb_entries, l3_tlb,
+ *                           &l4_tlb_entries, l4_tlb);
  * returns:
  *  0 - on success
  * -1 - on error
  */
 
 //Probably accept varargs as {size_t, struct xsti_tlb*}
-int get_tlb(size_t level_from, size_t level_to, ...);
-
-/**
- * Given the enum cpu_vendor stores the TLB cache information for the
- * specified cache_level in the struct xsti_tlb *tlb out parameter
- * 
- * Returns:
- *  on success  - 0
- *  error code  - in case an error occurred
- *  
- */
-unsigned xsti_get_data_tlb(enum xsti_cpu_vendor,
-                            unsigned cache_level,
-                            unsigned page_size,
-                            struct xsti_tlb *tlb_out);
+int xsti_get_tlb(size_t level_from, size_t level_to, ...);
 
 struct xsti_cpu_cache {
     unsigned    number_of_sets,
